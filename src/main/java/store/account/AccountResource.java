@@ -1,47 +1,58 @@
 package store.account;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.util.List;
 
 @RestController
 public class AccountResource implements AccountController {
 
+    @Autowired
+    private AccountService accountService;
+
     @Override
     public ResponseEntity<Void> create(AccountIn in) {
-        // TODO Auto-generated method stub
-        return null;
+        final Account a = accountService.create(
+            AccountParser.to(in)
+        );
+
+        return ResponseEntity.created(
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(a.id())
+                .toUri()
+        ).build();
     }
 
     @Override
     public ResponseEntity<Void> deleteById(String id) {
-        // TODO Auto-generated method stub
+        accountService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<String> health() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("OK");
     }
 
     @Override
     public ResponseEntity<List<AccountOut>> findAll() {
-        // TODO Auto-generated method stub
-        return null;
+        return ResponseEntity.ok(
+            AccountParser.to(
+                accountService.findByAll()
+            )
+        );
     }
 
     @Override
     public ResponseEntity<AccountOut> getById(String id) {
-        // just an example
-        AccountOut out = AccountOut.builder()
-            .name("John")
-            .email("JAlbert@xpto.gov")
-            .id("1345")
-            .build();
-        return ResponseEntity.ok(
-            out
-        );
-    }
+        Account out = accountService.findById(id);
 
+        return out == null ?
+            ResponseEntity.notFound().build() :
+            ResponseEntity.ok(AccountParser.to(out));
+    }
 }
