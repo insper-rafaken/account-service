@@ -46,5 +46,5 @@ public class AccountModel {
             .passwordSha256(this.passwordSha256)
             .build();
     }
-
+    
 }

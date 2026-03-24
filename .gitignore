@@ -23,4 +23,18 @@
 hs_err_pid*
 replay_pid*
 
-target/
+/target/
+.DS_Store
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.class
+*.jar
+*.war
+*.ear

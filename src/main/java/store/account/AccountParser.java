@@ -12,7 +12,7 @@ public class AccountParser {
                 .email(a.email())
                 .build();
     }
-
+    
     public static List<AccountOut> to(List<Account> l) {
         return l.stream().map(AccountParser::to).toList();
     }

@@ -1,10 +1,11 @@
 package store.account;
 
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import java.util.List;
 
 @RestController
 public class AccountResource implements AccountController {
@@ -17,7 +18,7 @@ public class AccountResource implements AccountController {
         final Account a = accountService.create(
             AccountParser.to(in)
         );
-
+        // returns a JSON in the HATEAOS standard.
         return ResponseEntity.created(
             ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -28,14 +29,14 @@ public class AccountResource implements AccountController {
     }
 
     @Override
-    public ResponseEntity<Void> deleteById(String id) {
+    public ResponseEntity<Void> delete(String id) {
         accountService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<String> health() {
-        return ResponseEntity.ok("OK");
+    public ResponseEntity<Void> healthCheck() {
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -48,11 +49,24 @@ public class AccountResource implements AccountController {
     }
 
     @Override
-    public ResponseEntity<AccountOut> getById(String id) {
+    public ResponseEntity<AccountOut> findById(String id) {
         Account out = accountService.findById(id);
+        return out == null ?
+            ResponseEntity.notFound().build() :
+            ResponseEntity.ok(
+                AccountParser.to(out) // transform from account to ou
+            );
+    }
 
+    @Override
+    public ResponseEntity<AccountOut> findByEmailAndPassword(AccountIn in) {
+        final Account out = accountService.findByEmailAndPassword(
+            in.email(),
+            in.password()
+        );
         return out == null ?
             ResponseEntity.notFound().build() :
             ResponseEntity.ok(AccountParser.to(out));
     }
+    
 }
